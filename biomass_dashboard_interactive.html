@@ -1,0 +1,650 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.dash{background:#0d1117;color:#e6edf3;font-family:var(--font-sans);font-size:13px;min-height:100vh}
+.hdr{background:#161b22;border-bottom:1px solid #21262d;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:15px;font-weight:500;color:#e6edf3}
+.hdr p{font-size:11px;color:#8b949e;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:14px;font-size:11px;color:#8b949e;flex-wrap:wrap}
+.pulse{width:7px;height:7px;border-radius:50%;background:#3fb950;display:inline-block;margin-right:5px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.status-ok{color:#3fb950;font-weight:500;font-size:11px}
+.filters{background:#0d1117;border-bottom:1px solid #21262d;padding:8px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filters label{font-size:11px;color:#8b949e}
+.filters select{background:#161b22;border:1px solid #30363d;color:#e6edf3;font-size:11px;padding:4px 8px;border-radius:5px;cursor:pointer}
+.filters select:hover{border-color:#388bfd}
+.btn{background:#1f2937;border:1px solid #30363d;color:#e6edf3;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:#2d3748;border-color:#388bfd}
+.btn.active{background:#0d2244;border-color:#388bfd;color:#79c0ff}
+.btn-danger{background:#2a1515;border-color:#5a1e1e;color:#f85149}
+.btn-danger:hover{background:#3a1e1e;border-color:#f85149}
+.btn-success{background:#1a3a1a;border-color:#1a4a1a;color:#3fb950}
+.btn-success:hover{background:#1e4a1e;border-color:#3fb950}
+.kpi-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:#21262d;border-bottom:1px solid #21262d}
+.kpi{background:#0d1117;padding:10px 12px;cursor:default;transition:background .15s}
+.kpi:hover{background:#161b22}
+.kpi-label{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.kpi-value{font-size:19px;font-weight:500;color:#e6edf3;transition:color .3s}
+.kpi-sub{font-size:10px;margin-top:3px}
+.kpi-pos{color:#3fb950}
+.kpi-neg{color:#f85149}
+.kpi-warn{color:#d29922}
+.flash{animation:flashUpdate .5s ease}
+@keyframes flashUpdate{0%{background:#1a3a1a}100%{background:transparent}}
+.body{display:grid;grid-template-columns:1fr 290px;min-height:600px}
+.left{display:flex;flex-direction:column;border-right:1px solid #21262d}
+.map-wrap{position:relative;background:#0d1117;flex:1;min-height:300px}
+.map-svg{width:100%;height:100%}
+.map-overlay{position:absolute;top:8px;left:10px;background:rgba(22,27,34,.92);border:1px solid #21262d;border-radius:5px;padding:5px 9px;font-size:10px;color:#8b949e}
+.map-legend{position:absolute;bottom:8px;left:10px;background:rgba(22,27,34,.92);border:1px solid #21262d;border-radius:5px;padding:7px 10px;font-size:10px;color:#8b949e}
+.leg-row{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.leg-row:last-child{margin-bottom:0}
+.marker-popup{position:absolute;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:9px 12px;font-size:11px;color:#e6edf3;min-width:160px;pointer-events:none;z-index:10;display:none}
+.marker-popup .pop-title{font-weight:500;margin-bottom:5px;font-size:12px}
+.marker-popup .pop-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;color:#8b949e}
+.marker-popup .pop-row span:last-child{color:#e6edf3}
+.chart-wrap{background:#161b22;border-top:1px solid #21262d;padding:10px 14px}
+.chart-title{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.right{display:flex;flex-direction:column;background:#161b22;overflow-y:auto;max-height:620px}
+.panel-hdr{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px 6px;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between}
+.ai-badge{background:#271a4a;color:#bc8cff;font-size:9px;padding:2px 6px;border-radius:8px;border:1px solid #3d2370;font-weight:500}
+.ai-panel{padding:8px 12px;border-bottom:1px solid #21262d}
+.ai-item{background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:7px 9px;margin-bottom:5px;cursor:pointer;transition:border-color .15s}
+.ai-item:hover{border-color:#388bfd}
+.ai-item:last-child{margin-bottom:0}
+.ai-item-title{font-size:11px;color:#e6edf3;font-weight:500;margin-bottom:2px}
+.ai-item-sub{font-size:10px;color:#8b949e}
+.ai-hl{color:#3fb950}
+.ai-hlb{color:#388bfd}
+.ai-hlp{color:#bc8cff}
+.fc-panel{padding:8px 12px;border-bottom:1px solid #21262d}
+.fc-bar-row{display:flex;align-items:center;gap:5px;margin-bottom:4px}
+.fc-label{font-size:10px;color:#8b949e;width:52px;flex-shrink:0}
+.fc-track{flex:1;height:5px;background:#21262d;border-radius:3px;overflow:hidden}
+.fc-fill-g{height:100%;border-radius:3px;background:#3fb950;transition:width .6s ease}
+.fc-fill-b{height:100%;border-radius:3px;background:#388bfd;transition:width .6s ease}
+.fc-val{font-size:10px;color:#e6edf3;width:32px;text-align:right;flex-shrink:0}
+.risk-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid #21262d}
+.risk-item:last-child{border-bottom:none}
+.risk-icon{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700}
+.risk-r{background:#5a1e1e;color:#f85149}
+.risk-y{background:#3d2f00;color:#d29922}
+.risk-g{background:#1a3a1a;color:#3fb950}
+.risk-text{font-size:10px;color:#e6edf3;line-height:1.4}
+.risk-time{font-size:9px;color:#8b949e;margin-top:1px}
+.feed-panel{padding:8px 12px}
+.feed-item{display:flex;align-items:flex-start;gap:7px;padding:4px 0;border-bottom:1px solid #21262d;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.feed-text{font-size:10px;color:#8b949e;line-height:1.4;flex:1}
+.feed-text b{color:#e6edf3;font-weight:500}
+.feed-time{font-size:9px;color:#484f58;white-space:nowrap}
+.alert-banner{background:#2a1515;border:1px solid #5a1e1e;border-radius:5px;padding:7px 10px;margin:8px 12px;font-size:11px;color:#f85149;display:none;animation:fadeIn .3s ease}
+.alert-banner b{display:block;font-weight:500;margin-bottom:2px}
+.tooltip-box{position:absolute;background:#161b22;border:1px solid #30363d;border-radius:5px;padding:6px 9px;font-size:10px;color:#e6edf3;pointer-events:none;z-index:20;display:none;white-space:nowrap}
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Biomass Intelligence System — interactive real-time command center dashboard for Java supply chain monitoring</h2>
+
+<div class="dash" id="dash">
+<div class="hdr">
+  <div>
+    <h1>Biomass Intelligence System Dashboard</h1>
+    <p>Real-Time Monitoring &amp; AI Decision Engine</p>
+  </div>
+  <div class="hdr-right">
+    <span id="clock">—</span>
+    <span><span class="pulse"></span><span class="status-ok" id="sysStatus">All systems operational</span></span>
+    <button class="btn btn-danger" id="simShortage">Simulate shortage</button>
+    <button class="btn btn-success" id="simOptimize">Run AI optimize</button>
+    <button class="btn" id="toggleLive" style="min-width:80px">Live: ON</button>
+  </div>
+</div>
+
+<div class="filters">
+  <label>Region:</label>
+  <select id="filterRegion">
+    <option value="all">All Java</option>
+    <option value="west">West Java</option>
+    <option value="central">Central Java</option>
+    <option value="east">East Java</option>
+  </select>
+  <label>Source:</label>
+  <select id="filterSource">
+    <option value="all">All sources</option>
+    <option value="agricultural">Agricultural</option>
+    <option value="forestry">Forestry</option>
+    <option value="industrial">Industrial</option>
+  </select>
+  <label>Time range:</label>
+  <select id="filterTime">
+    <option value="12w">12 weeks</option>
+    <option value="6w">6 weeks</option>
+    <option value="4w">4 weeks</option>
+  </select>
+  <button class="btn active" id="btnReset">Reset filters</button>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi" title="Click for breakdown" onclick="showKPIDetail('supply')">
+    <div class="kpi-label">Total biomass supply</div>
+    <div class="kpi-value" id="kpiSupply">142,380</div>
+    <div class="kpi-sub kpi-pos" id="kpiSupplyTrend">▲ 4.2% vs last week · tons</div>
+  </div>
+  <div class="kpi" onclick="showKPIDetail('routes')">
+    <div class="kpi-label">Active routes</div>
+    <div class="kpi-value" id="kpiRoutes">34</div>
+    <div class="kpi-sub" id="kpiRoutesSub" style="color:#8b949e">6 AI-optimized · 2 rerouting</div>
+  </div>
+  <div class="kpi" onclick="showKPIDetail('cost')">
+    <div class="kpi-label">Cost efficiency</div>
+    <div class="kpi-value kpi-pos" id="kpiCost">21.4%</div>
+    <div class="kpi-sub kpi-pos">reduction vs baseline</div>
+  </div>
+  <div class="kpi" onclick="showKPIDetail('util')">
+    <div class="kpi-label">Utilization rate</div>
+    <div class="kpi-value kpi-pos" id="kpiUtil">74.8%</div>
+    <div class="kpi-sub kpi-pos" id="kpiUtilSub">▲ target &gt;70% — on track</div>
+  </div>
+  <div class="kpi" onclick="showKPIDetail('gap')">
+    <div class="kpi-label">Supply–demand gap</div>
+    <div class="kpi-value kpi-warn" id="kpiGap">−8,240</div>
+    <div class="kpi-sub kpi-warn" id="kpiGapSub">▼ shortage risk · E. Java</div>
+  </div>
+</div>
+
+<div class="body">
+<div class="left">
+  <div class="map-wrap" id="mapWrap">
+    <div class="map-overlay">Java Island — Biomass Supply Network</div>
+    <svg class="map-svg" viewBox="0 0 680 290" id="mapSvg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrB" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="#388bfd" opacity=".7"/></marker>
+        <marker id="arrP" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="#bc8cff" opacity=".9"/></marker>
+      </defs>
+      <rect width="680" height="290" fill="#0d1117"/>
+      <line x1="0" y1="72" x2="680" y2="72" stroke="#21262d" stroke-width=".5"/>
+      <line x1="0" y1="144" x2="680" y2="144" stroke="#21262d" stroke-width=".5"/>
+      <line x1="0" y1="216" x2="680" y2="216" stroke="#21262d" stroke-width=".5"/>
+      <line x1="170" y1="0" x2="170" y2="290" stroke="#21262d" stroke-width=".5"/>
+      <line x1="340" y1="0" x2="340" y2="290" stroke="#21262d" stroke-width=".5"/>
+      <line x1="510" y1="0" x2="510" y2="290" stroke="#21262d" stroke-width=".5"/>
+      <path d="M28,152 Q80,118 140,126 Q200,130 260,120 Q340,112 400,116 Q460,114 520,118 Q578,122 638,136 Q648,158 638,182 Q598,196 558,192 Q518,200 478,198 Q438,205 400,202 Q360,208 320,201 Q280,195 240,198 Q200,193 160,189 Q118,182 78,178 Q48,170 28,152Z" fill="#1a2332" stroke="#21262d" stroke-width="1"/>
+      <text x="72" y="108" font-size="9" fill="#484f58">West Java</text>
+      <text x="245" y="106" font-size="9" fill="#484f58">Central Java</text>
+      <text x="455" y="108" font-size="9" fill="#484f58">East Java</text>
+
+      <g id="routes-normal">
+        <line x1="108" y1="150" x2="218" y2="155" stroke="#388bfd" stroke-width="1.5" stroke-dasharray="5,3" opacity=".45" marker-end="url(#arrB)"/>
+        <line x1="218" y1="155" x2="348" y2="146" stroke="#388bfd" stroke-width="1.5" stroke-dasharray="5,3" opacity=".45" marker-end="url(#arrB)"/>
+        <line x1="348" y1="146" x2="498" y2="150" stroke="#388bfd" stroke-width="1.5" stroke-dasharray="5,3" opacity=".45" marker-end="url(#arrB)"/>
+        <line x1="183" y1="160" x2="348" y2="146" stroke="#388bfd" stroke-width="1" stroke-dasharray="4,3" opacity=".3" marker-end="url(#arrB)"/>
+        <line x1="308" y1="164" x2="498" y2="150" stroke="#388bfd" stroke-width="1" stroke-dasharray="4,3" opacity=".3" marker-end="url(#arrB)"/>
+      </g>
+      <path id="ai-route" d="M108,150 Q200,126 348,146 Q438,140 558,140" stroke="#bc8cff" stroke-width="2" stroke-dasharray="7,3" fill="none" opacity=".85" marker-end="url(#arrP)"/>
+      <text x="215" y="134" font-size="8" fill="#bc8cff" opacity=".9" id="aiRouteLabel">AI route — 18% cost saving</text>
+      <circle id="alertZone" cx="438" cy="160" r="22" fill="none" stroke="#f85149" stroke-width="1" stroke-dasharray="4,2" opacity=".7"/>
+      <text x="438" y="192" text-anchor="middle" font-size="7" fill="#f85149" opacity=".9">Shortage risk</text>
+
+      <g class="map-source" data-id="banyuwangi" style="cursor:pointer">
+        <circle cx="108" cy="150" r="9" fill="#1a3a1a" stroke="#3fb950" stroke-width="1.5" class="marker-pulse"/>
+        <circle cx="108" cy="150" r="4" fill="#3fb950"/>
+        <text x="108" y="168" text-anchor="middle" font-size="8" fill="#3fb950">Banyuwangi</text>
+      </g>
+      <g class="map-source" data-id="jember" style="cursor:pointer">
+        <circle cx="183" cy="160" r="7" fill="#1a3a1a" stroke="#3fb950" stroke-width="1.5"/>
+        <circle cx="183" cy="160" r="3" fill="#3fb950"/>
+        <text x="183" y="177" text-anchor="middle" font-size="8" fill="#3fb950">Jember</text>
+      </g>
+      <g class="map-source" data-id="malang" style="cursor:pointer">
+        <circle cx="308" cy="164" r="8" fill="#1a3a1a" stroke="#3fb950" stroke-width="1.5"/>
+        <circle cx="308" cy="164" r="3.5" fill="#3fb950"/>
+        <text x="308" y="181" text-anchor="middle" font-size="8" fill="#3fb950">Malang</text>
+      </g>
+      <g class="map-source" data-id="situbondo" style="cursor:pointer">
+        <circle cx="153" cy="148" r="6" fill="#1a3a1a" stroke="#3fb950" stroke-width="1"/>
+        <circle cx="153" cy="148" r="2.5" fill="#3fb950"/>
+        <text x="153" y="138" text-anchor="middle" font-size="7" fill="#3fb950">Situbondo</text>
+      </g>
+      <g class="map-source" data-id="pasuruan" style="cursor:pointer">
+        <circle cx="248" cy="155" r="6" fill="#1a3a1a" stroke="#3fb950" stroke-width="1"/>
+        <circle cx="248" cy="155" r="2.5" fill="#3fb950"/>
+        <text x="248" y="170" text-anchor="middle" font-size="7" fill="#3fb950">Pasuruan</text>
+      </g>
+
+      <g class="map-hub" data-id="surabaya" style="cursor:pointer">
+        <rect x="210" y="147" width="16" height="16" rx="2" fill="#0d2244" stroke="#388bfd" stroke-width="1.5"/>
+        <rect x="214" y="151" width="8" height="8" rx="1" fill="#388bfd"/>
+        <text x="218" y="174" text-anchor="middle" font-size="8" fill="#388bfd">Surabaya hub</text>
+      </g>
+      <g class="map-hub" data-id="kediri" style="cursor:pointer">
+        <rect x="340" y="138" width="16" height="16" rx="2" fill="#0d2244" stroke="#388bfd" stroke-width="1.5"/>
+        <rect x="344" y="142" width="8" height="8" rx="1" fill="#388bfd"/>
+        <text x="348" y="164" text-anchor="middle" font-size="8" fill="#388bfd">Plant B — Kediri</text>
+      </g>
+      <g class="map-hub" data-id="solo" style="cursor:pointer">
+        <rect x="490" y="142" width="16" height="16" rx="2" fill="#0d2244" stroke="#388bfd" stroke-width="2"/>
+        <rect x="494" y="146" width="8" height="8" rx="1" fill="#388bfd"/>
+        <text x="498" y="168" text-anchor="middle" font-size="8" fill="#388bfd">Plant A — Solo</text>
+      </g>
+      <g class="map-hub" data-id="semarang" style="cursor:pointer">
+        <rect x="575" y="133" width="14" height="14" rx="2" fill="#0d2244" stroke="#388bfd" stroke-width="1.5"/>
+        <rect x="579" y="137" width="6" height="6" rx="1" fill="#388bfd"/>
+        <text x="582" y="155" text-anchor="middle" font-size="7" fill="#388bfd">Semarang</text>
+      </g>
+    </svg>
+    <div class="marker-popup" id="markerPopup">
+      <div class="pop-title" id="popTitle">—</div>
+      <div class="pop-row"><span>Supply</span><span id="popSupply">—</span></div>
+      <div class="pop-row"><span>Type</span><span id="popType">—</span></div>
+      <div class="pop-row"><span>Status</span><span id="popStatus">—</span></div>
+      <div class="pop-row"><span>Region</span><span id="popRegion">—</span></div>
+      <div class="pop-row" id="popCapRow"><span>Capacity</span><span id="popCap">—</span></div>
+    </div>
+    <div class="map-legend">
+      <div class="leg-row"><svg width="10" height="10"><circle cx="5" cy="5" r="4" fill="#3fb950"/></svg> Biomass source</div>
+      <div class="leg-row"><svg width="10" height="10"><rect x="1" y="1" width="8" height="8" rx="1" fill="#388bfd"/></svg> Hub / Plant</div>
+      <div class="leg-row"><svg width="10" height="4" style="margin-top:3px"><line x1="0" y1="2" x2="10" y2="2" stroke="#bc8cff" stroke-width="2" stroke-dasharray="3,2"/></svg> AI route</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">
+      <span>Supply vs demand — weekly</span>
+      <div style="display:flex;gap:10px;font-size:9px">
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:3px;background:#3fb950;display:inline-block;border-radius:2px"></span>Supply</span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:3px;background:#388bfd;display:inline-block;border-radius:2px;border-bottom:1px dashed #388bfd"></span>Demand</span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:5px;background:rgba(248,81,73,.2);display:inline-block;border-radius:1px"></span>Gap</span>
+      </div>
+    </div>
+    <div style="position:relative;height:90px"><canvas id="sdChart" role="img" aria-label="Line chart of weekly biomass supply vs demand over 12 weeks">Supply and demand trends with gap highlighting.</canvas></div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="alert-banner" id="alertBanner">
+    <b>Supply shortage alert</b>
+    East Java projected deficit of 12,400 tons within 72 hrs. Immediate reallocation recommended.
+  </div>
+
+  <div class="panel-hdr">AI Optimization Engine <span class="ai-badge">LIVE</span></div>
+  <div class="ai-panel">
+    <div class="ai-item" id="aiRoute" onclick="applyAIRoute()">
+      <div class="ai-item-title">Route optimization <span class="ai-hl" id="aiRouteSaving">— 18% cost reduction</span></div>
+      <div class="ai-item-sub">Rerouting Banyuwangi → Solo via Kediri bypass. <span style="color:#8b949e">Click to apply.</span></div>
+    </div>
+    <div class="ai-item" id="aiAlloc" onclick="applyAllocation()">
+      <div class="ai-item-title">Allocation: <span class="ai-hlb">Redirect to Plant B</span></div>
+      <div class="ai-item-sub">Surplus <span id="aiAllocTons">4,200</span> t in Malang. Transfer to Kediri in 48 hrs. <span style="color:#8b949e">Click to apply.</span></div>
+    </div>
+    <div class="ai-item" onclick="applySchedule()">
+      <div class="ai-item-title">Schedule update <span class="ai-hlp">— AI rescheduled</span></div>
+      <div class="ai-item-sub">3 deliveries shifted Tue–Wed. Fleet utilization <span id="aiFleet">+12%</span>. <span style="color:#8b949e">Click to apply.</span></div>
+    </div>
+  </div>
+
+  <div class="panel-hdr">Forecast &amp; Risk Alerts</div>
+  <div class="fc-panel">
+    <div style="font-size:9px;color:#8b949e;margin-bottom:5px">7-day supply forecast (×1,000 t)</div>
+    <div class="fc-bar-row"><span class="fc-label">Mon</span><div class="fc-track"><div class="fc-fill-g" id="fb0" style="width:82%"></div></div><span class="fc-val" id="fv0">20.5</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Tue</span><div class="fc-track"><div class="fc-fill-g" id="fb1" style="width:75%"></div></div><span class="fc-val" id="fv1">18.8</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Wed</span><div class="fc-track"><div class="fc-fill-g" id="fb2" style="width:70%"></div></div><span class="fc-val" id="fv2">17.5</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Thu</span><div class="fc-track"><div class="fc-fill-g" id="fb3" style="width:58%"></div></div><span class="fc-val" id="fv3">14.5</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Fri</span><div class="fc-track"><div class="fc-fill-g" id="fb4" style="width:62%"></div></div><span class="fc-val" id="fv4">15.5</span></div>
+    <div style="font-size:9px;color:#8b949e;margin:6px 0 4px">Demand projection (30-day)</div>
+    <div class="fc-bar-row"><span class="fc-label">Week 1</span><div class="fc-track"><div class="fc-fill-b" style="width:78%"></div></div><span class="fc-val">19.5</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Week 2</span><div class="fc-track"><div class="fc-fill-b" style="width:85%"></div></div><span class="fc-val">21.3</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Week 3</span><div class="fc-track"><div class="fc-fill-b" style="width:90%"></div></div><span class="fc-val">22.5</span></div>
+    <div class="fc-bar-row"><span class="fc-label">Week 4</span><div class="fc-track"><div class="fc-fill-b" style="width:96%"></div></div><span class="fc-val">24.0</span></div>
+    <div style="border-top:1px solid #21262d;margin-top:6px;padding-top:6px">
+      <div style="font-size:9px;color:#8b949e;margin-bottom:4px">Risk alerts</div>
+      <div class="risk-item"><span class="risk-icon risk-r">!</span><div><div class="risk-text" id="risk1text">Shortage — East Java (−8,240 t)</div><div class="risk-time">High confidence · 72 hrs</div></div></div>
+      <div class="risk-item"><span class="risk-icon risk-y">!</span><div><div class="risk-text">Demand spike — Semarang +22%</div><div class="risk-time">Moderate · 14 days</div></div></div>
+      <div class="risk-item"><span class="risk-icon risk-y">~</span><div><div class="risk-text">Weather delay — Central Java R-07</div><div class="risk-time">Low–moderate · Mon–Tue</div></div></div>
+      <div class="risk-item"><span class="risk-icon risk-g">✓</span><div><div class="risk-text">W. Java surplus — buffer 5,100 t</div><div class="risk-time">Stable · 30-day outlook</div></div></div>
+    </div>
+  </div>
+
+  <div class="panel-hdr">Activity feed</div>
+  <div class="feed-panel" id="feedPanel">
+    <div class="feed-item"><span class="feed-dot" style="background:#3fb950"></span><span class="feed-text"><b>Supply data received</b> — Banyuwangi +3,200 t</span><span class="feed-time">09:41</span></div>
+    <div class="feed-item"><span class="feed-dot" style="background:#bc8cff"></span><span class="feed-text"><b>Route updated</b> — AI rerouted R-07 via Kediri</span><span class="feed-time">09:38</span></div>
+    <div class="feed-item"><span class="feed-dot" style="background:#f85149"></span><span class="feed-text"><b>Demand spike detected</b> — Semarang +22%</span><span class="feed-time">09:32</span></div>
+    <div class="feed-item"><span class="feed-dot" style="background:#388bfd"></span><span class="feed-text"><b>Delivery confirmed</b> — Plant A Solo 4,800 t</span><span class="feed-time">09:21</span></div>
+    <div class="feed-item"><span class="feed-dot" style="background:#d29922"></span><span class="feed-text"><b>Advisory</b> — Redirect 4,200 t Malang → Kediri</span><span class="feed-time">09:15</span></div>
+  </div>
+</div>
+</div>
+
+<div class="tooltip-box" id="tooltip"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var liveOn = true;
+var shortageActive = false;
+var supplyVal = 142380;
+var routesVal = 34;
+var costVal = 21.4;
+var utilVal = 74.8;
+var gapVal = -8240;
+
+var markerData = {
+  banyuwangi:{title:'Banyuwangi',supply:'32,400 t',type:'Agricultural',status:'Active',region:'East Java',cap:null},
+  jember:{title:'Jember',supply:'18,200 t',type:'Forestry',status:'Active',region:'East Java',cap:null},
+  malang:{title:'Malang',supply:'24,600 t',type:'Agricultural',status:'Surplus +4,200 t',region:'East Java',cap:null},
+  situbondo:{title:'Situbondo',supply:'9,800 t',type:'Agricultural',status:'Active',region:'East Java',cap:null},
+  pasuruan:{title:'Pasuruan',supply:'12,100 t',type:'Industrial',status:'Active',region:'East Java',cap:null},
+  surabaya:{title:'Surabaya Hub',supply:null,type:'Distribution hub',status:'Operational',region:'East Java',cap:'85,000 t/mo'},
+  kediri:{title:'Plant B — Kediri',supply:null,type:'Processing plant',status:'Running 74%',region:'East Java',cap:'60,000 t/mo'},
+  solo:{title:'Plant A — Solo',supply:null,type:'Processing plant',status:'Running 81%',region:'Central Java',cap:'70,000 t/mo'},
+  semarang:{title:'Semarang Hub',supply:null,type:'Distribution hub',status:'High demand',region:'Central Java',cap:'50,000 t/mo'}
+};
+
+var weeks12 = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'];
+var supplyData = [21,22,20,23,22,24,21,23,19,17,16,15];
+var demandData = [18,19,20,20,21,21,22,22,24,25,24,23];
+var sdChart;
+
+function initChart(){
+  var ctx = document.getElementById('sdChart').getContext('2d');
+  sdChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:weeks12,
+      datasets:[
+        {label:'Supply',data:supplyData.slice(),borderColor:'#3fb950',borderWidth:1.5,pointRadius:2.5,pointBackgroundColor:'#3fb950',fill:false,tension:.35},
+        {label:'Demand',data:demandData.slice(),borderColor:'#388bfd',borderWidth:1.5,borderDash:[4,2],pointRadius:2.5,pointBackgroundColor:'#388bfd',fill:false,tension:.35},
+        {label:'Gap',data:demandData.map((d,i)=>d>supplyData[i]?d:null),borderColor:'rgba(248,81,73,0)',backgroundColor:'rgba(248,81,73,0.15)',pointRadius:0,fill:'-1',tension:.35}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.parsed.y+' kt'}}}},
+      scales:{
+        x:{ticks:{color:'#484f58',font:{size:9}},grid:{color:'#21262d'}},
+        y:{ticks:{color:'#484f58',font:{size:9}},grid:{color:'#21262d'},min:12,max:28}
+      }
+    }
+  });
+}
+
+function updateChart(){
+  var timeVal = document.getElementById('filterTime').value;
+  var n = timeVal==='4w'?4:timeVal==='6w'?6:12;
+  sdChart.data.labels = weeks12.slice(-n);
+  sdChart.data.datasets[0].data = supplyData.slice(-n);
+  sdChart.data.datasets[1].data = demandData.slice(-n);
+  sdChart.data.datasets[2].data = demandData.slice(-n).map((d,i)=>d>supplyData.slice(-n)[i]?d:null);
+  sdChart.update();
+}
+
+function pad(n){return String(n).padStart(2,'0')}
+function updateClock(){
+  var now=new Date();
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('clock').textContent=days[now.getDay()]+', '+pad(now.getDate())+' '+months[now.getMonth()]+' '+now.getFullYear()+' — '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+}
+
+function flashKPI(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.closest('.kpi').classList.remove('flash');
+  void el.closest('.kpi').offsetWidth;
+  el.closest('.kpi').classList.add('flash');
+}
+
+function rand(min,max){return Math.round(min+(Math.random()*(max-min)))}
+function randF(min,max,d){return parseFloat((min+(Math.random()*(max-min))).toFixed(d))}
+
+function liveUpdate(){
+  if(!liveOn)return;
+  var delta=rand(-800,1200);
+  supplyVal=Math.max(130000,supplyVal+delta);
+  document.getElementById('kpiSupply').textContent=supplyVal.toLocaleString();
+  flashKPI('kpiSupply');
+
+  var rDelta=rand(-1,2);
+  routesVal=Math.max(28,Math.min(42,routesVal+rDelta));
+  document.getElementById('kpiRoutes').textContent=routesVal;
+
+  var cDelta=randF(-0.3,0.4,1);
+  costVal=Math.max(15,Math.min(26,costVal+cDelta));
+  document.getElementById('kpiCost').textContent=costVal.toFixed(1)+'%';
+  document.getElementById('kpiCost').className='kpi-value '+(costVal>=18?'kpi-pos':'kpi-warn');
+
+  var uDelta=randF(-0.2,0.3,1);
+  utilVal=Math.max(65,Math.min(82,utilVal+uDelta));
+  document.getElementById('kpiUtil').textContent=utilVal.toFixed(1)+'%';
+  document.getElementById('kpiUtil').className='kpi-value '+(utilVal>=70?'kpi-pos':'kpi-warn');
+  document.getElementById('kpiUtilSub').textContent=utilVal>=70?'▲ target >70% — on track':'▼ below target — action needed';
+  document.getElementById('kpiUtilSub').className='kpi-sub '+(utilVal>=70?'kpi-pos':'kpi-neg');
+
+  if(!shortageActive){
+    var gDelta=rand(-500,700);
+    gapVal=Math.min(-1000,gapVal+gDelta);
+    document.getElementById('kpiGap').textContent=(gapVal>0?'+':'')+gapVal.toLocaleString();
+    var gapSev=Math.abs(gapVal);
+    document.getElementById('kpiGap').className='kpi-value '+(gapSev>10000?'kpi-neg':gapSev>5000?'kpi-warn':'kpi-pos');
+  }
+
+  var fLabels=['fb0','fb1','fb2','fb3','fb4'];
+  var fVals=['fv0','fv1','fv2','fv3','fv4'];
+  fLabels.forEach(function(id,i){
+    var cur=parseFloat(document.getElementById(fVals[i]).textContent);
+    var nd=Math.max(8,Math.min(25,cur+randF(-0.4,0.5,1)));
+    document.getElementById(fVals[i]).textContent=nd.toFixed(1);
+    document.getElementById(id).style.width=Math.round((nd/25)*100)+'%';
+  });
+
+  pushFeedItem();
+  maybeUpdateChart();
+}
+
+var feedMessages=[
+  {dot:'#3fb950',txt:'<b>Supply sync</b> — {n} source nodes updated'},
+  {dot:'#388bfd',txt:'<b>Delivery confirmed</b> — Plant A received {t} t'},
+  {dot:'#bc8cff',txt:'<b>AI re-optimized</b> — Route R-{r} adjusted'},
+  {dot:'#d29922',txt:'<b>Advisory</b> — Monitor East Java buffer'},
+  {dot:'#3fb950',txt:'<b>New batch logged</b> — Malang +{t} t'},
+  {dot:'#388bfd',txt:'<b>Fleet update</b> — {v} vehicles en route'},
+];
+var feedCount=0;
+function pushFeedItem(){
+  if(feedCount++%3!==0)return;
+  var m=feedMessages[Math.floor(Math.random()*feedMessages.length)];
+  var now=new Date();
+  var txt=m.txt.replace('{n}',rand(8,18)).replace('{t}',rand(1800,5200).toLocaleString()).replace('{r}',rand(1,12)).replace('{v}',rand(14,32));
+  var panel=document.getElementById('feedPanel');
+  var item=document.createElement('div');
+  item.className='feed-item';
+  item.innerHTML='<span class="feed-dot" style="background:'+m.dot+'"></span><span class="feed-text">'+txt+'</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(item,panel.firstChild);
+  while(panel.children.length>8)panel.removeChild(panel.lastChild);
+}
+
+var chartTick=0;
+function maybeUpdateChart(){
+  if(++chartTick%5!==0)return;
+  supplyData.push(Math.max(12,Math.min(27,supplyData[supplyData.length-1]+rand(-2,2))));
+  supplyData.shift();
+  demandData.push(Math.max(14,Math.min(28,demandData[demandData.length-1]+rand(-1,2))));
+  demandData.shift();
+  updateChart();
+}
+
+function showMarkerPopup(id,svgX,svgY){
+  var d=markerData[id];
+  if(!d)return;
+  var pop=document.getElementById('markerPopup');
+  document.getElementById('popTitle').textContent=d.title;
+  document.getElementById('popSupply').textContent=d.supply||'—';
+  document.getElementById('popType').textContent=d.type;
+  document.getElementById('popStatus').textContent=d.status;
+  document.getElementById('popRegion').textContent=d.region;
+  var capRow=document.getElementById('popCapRow');
+  if(d.cap){capRow.style.display='flex';document.getElementById('popCap').textContent=d.cap;}else{capRow.style.display='none';}
+  var svg=document.getElementById('mapSvg');
+  var rect=svg.getBoundingClientRect();
+  var vbW=680,vbH=290;
+  var px=(svgX/vbW)*rect.width+rect.left;
+  var py=(svgY/vbH)*rect.height+rect.top;
+  var wrap=document.getElementById('mapWrap');
+  var wRect=wrap.getBoundingClientRect();
+  var lx=px-wRect.left+12;
+  var ly=py-wRect.top-20;
+  pop.style.left=Math.min(lx,wRect.width-180)+'px';
+  pop.style.top=Math.max(0,ly)+'px';
+  pop.style.display='block';
+}
+
+document.getElementById('mapSvg').addEventListener('click',function(e){
+  var g=e.target.closest('.map-source,.map-hub');
+  if(!g){document.getElementById('markerPopup').style.display='none';return;}
+  var id=g.getAttribute('data-id');
+  var circ=g.querySelector('circle')||g.querySelector('rect');
+  var cx=parseFloat(circ.getAttribute('cx')||circ.getAttribute('x'))+parseFloat(circ.getAttribute('width')||0)/2;
+  var cy=parseFloat(circ.getAttribute('cy')||circ.getAttribute('y'))+parseFloat(circ.getAttribute('height')||0)/2;
+  showMarkerPopup(id,cx,cy);
+  e.stopPropagation();
+});
+document.addEventListener('click',function(){document.getElementById('markerPopup').style.display='none';});
+
+document.getElementById('simShortage').addEventListener('click',function(){
+  shortageActive=true;
+  gapVal=-12400;
+  document.getElementById('kpiGap').textContent='−12,400';
+  document.getElementById('kpiGap').className='kpi-value kpi-neg';
+  document.getElementById('kpiGapSub').textContent='▼ critical shortage — E. Java';
+  document.getElementById('kpiGapSub').className='kpi-sub kpi-neg';
+  document.getElementById('alertBanner').style.display='block';
+  document.getElementById('alertZone').style.strokeWidth='2';
+  document.getElementById('alertZone').style.opacity='1';
+  document.getElementById('risk1text').textContent='CRITICAL — East Java deficit 12,400 t';
+  document.getElementById('sysStatus').textContent='Alert: shortage detected';
+  document.getElementById('sysStatus').style.color='#f85149';
+  document.querySelector('.pulse').style.background='#f85149';
+  pushAlertFeed();
+});
+
+function pushAlertFeed(){
+  var panel=document.getElementById('feedPanel');
+  var item=document.createElement('div');
+  item.className='feed-item';
+  var now=new Date();
+  item.innerHTML='<span class="feed-dot" style="background:#f85149"></span><span class="feed-text"><b>ALERT: Supply shortage</b> — East Java critical deficit 12,400 t</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(item,panel.firstChild);
+}
+
+document.getElementById('simOptimize').addEventListener('click',function(){
+  shortageActive=false;
+  gapVal=rand(-4000,-2000);
+  costVal=Math.min(26,costVal+rand(2,4));
+  utilVal=Math.min(82,utilVal+randF(1,3,1));
+  document.getElementById('kpiGap').textContent=(gapVal).toLocaleString().replace('-','−');
+  document.getElementById('kpiGap').className='kpi-value kpi-warn';
+  document.getElementById('kpiGapSub').textContent='▲ improved by AI optimization';
+  document.getElementById('kpiGapSub').className='kpi-sub kpi-pos';
+  document.getElementById('kpiCost').textContent=costVal.toFixed(1)+'%';
+  document.getElementById('kpiUtil').textContent=utilVal.toFixed(1)+'%';
+  document.getElementById('alertBanner').style.display='none';
+  document.getElementById('aiRouteSaving').textContent='— '+costVal.toFixed(0)+'% cost reduction';
+  document.getElementById('aiAllocTons').textContent=rand(3000,5500).toLocaleString();
+  document.getElementById('aiFleet').textContent='+'+rand(10,18)+'%';
+  document.getElementById('alertZone').style.opacity='.4';
+  document.getElementById('sysStatus').textContent='All systems operational';
+  document.getElementById('sysStatus').style.color='#3fb950';
+  document.querySelector('.pulse').style.background='#3fb950';
+  var panel=document.getElementById('feedPanel');
+  var item=document.createElement('div');item.className='feed-item';
+  var now=new Date();
+  item.innerHTML='<span class="feed-dot" style="background:#bc8cff"></span><span class="feed-text"><b>AI optimization complete</b> — gap reduced, cost efficiency up to '+costVal.toFixed(1)+'%</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(item,panel.firstChild);
+  flashKPI('kpiCost');flashKPI('kpiUtil');
+});
+
+document.getElementById('toggleLive').addEventListener('click',function(){
+  liveOn=!liveOn;
+  this.textContent=liveOn?'Live: ON':'Live: OFF';
+  this.className=liveOn?'btn':'btn btn-danger';
+});
+
+function applyAIRoute(){
+  var item=document.getElementById('aiRoute');
+  item.style.borderColor='#3fb950';
+  item.querySelector('.ai-item-sub').innerHTML='Route applied. Cost saving locked in.';
+  var panel=document.getElementById('feedPanel');
+  var el=document.createElement('div');el.className='feed-item';
+  var now=new Date();
+  el.innerHTML='<span class="feed-dot" style="background:#bc8cff"></span><span class="feed-text"><b>AI route applied</b> — Banyuwangi bypass active</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(el,panel.firstChild);
+}
+function applyAllocation(){
+  var item=document.getElementById('aiAlloc');
+  item.style.borderColor='#388bfd';
+  item.querySelector('.ai-item-sub').innerHTML='Transfer order issued to Kediri plant.';
+  var panel=document.getElementById('feedPanel');
+  var el=document.createElement('div');el.className='feed-item';
+  var now=new Date();
+  el.innerHTML='<span class="feed-dot" style="background:#388bfd"></span><span class="feed-text"><b>Allocation applied</b> — Malang → Kediri transfer issued</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(el,panel.firstChild);
+}
+function applySchedule(){
+  var panel=document.getElementById('feedPanel');
+  var el=document.createElement('div');el.className='feed-item';
+  var now=new Date();
+  el.innerHTML='<span class="feed-dot" style="background:#bc8cff"></span><span class="feed-text"><b>Schedule applied</b> — 3 deliveries rescheduled Tue–Wed</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(el,panel.firstChild);
+}
+
+function showKPIDetail(type){
+  var msgs={
+    supply:'Total supply across all 5 active source nodes. Largest contributors: Malang (24,600 t), Banyuwangi (32,400 t).',
+    routes:'34 active routes. 6 AI-optimized for cost efficiency. 2 currently being rerouted due to weather conditions in Central Java.',
+    cost:'Cost efficiency vs baseline: '+costVal.toFixed(1)+'%. Achieved via AI route optimization and dynamic scheduling adjustments.',
+    util:'Utilization rate: '+utilVal.toFixed(1)+'%. Above the 70% target. Plant A Solo at 81%, Plant B Kediri at 74%.',
+    gap:'Current supply–demand gap: '+gapVal.toLocaleString()+' tons. Concentrated in East Java processing zone.'
+  };
+  var panel=document.getElementById('feedPanel');
+  var el=document.createElement('div');el.className='feed-item';
+  var now=new Date();
+  el.innerHTML='<span class="feed-dot" style="background:#d29922"></span><span class="feed-text"><b>KPI detail</b> — '+msgs[type]+'</span><span class="feed-time">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span>';
+  panel.insertBefore(el,panel.firstChild);
+  while(panel.children.length>8)panel.removeChild(panel.lastChild);
+}
+
+document.getElementById('filterTime').addEventListener('change',updateChart);
+document.getElementById('filterRegion').addEventListener('change',function(){
+  var v=this.value;
+  var items=document.querySelectorAll('.map-source,.map-hub');
+  var regionMap={banyuwangi:'east',jember:'east',malang:'east',situbondo:'east',pasuruan:'east',surabaya:'east',kediri:'east',solo:'central',semarang:'central'};
+  items.forEach(function(g){
+    var id=g.getAttribute('data-id');
+    var r=regionMap[id];
+    g.style.opacity=(v==='all'||r===v)?'1':'0.2';
+  });
+});
+document.getElementById('filterSource').addEventListener('change',function(){
+  var v=this.value;
+  var srcType={banyuwangi:'agricultural',jember:'forestry',malang:'agricultural',situbondo:'agricultural',pasuruan:'industrial'};
+  document.querySelectorAll('.map-source').forEach(function(g){
+    var id=g.getAttribute('data-id');
+    g.style.opacity=(v==='all'||srcType[id]===v)?'1':'0.2';
+  });
+});
+document.getElementById('btnReset').addEventListener('click',function(){
+  document.getElementById('filterRegion').value='all';
+  document.getElementById('filterSource').value='all';
+  document.getElementById('filterTime').value='12w';
+  document.querySelectorAll('.map-source,.map-hub').forEach(function(g){g.style.opacity='1';});
+  updateChart();
+});
+
+initChart();
+updateClock();
+setInterval(updateClock,1000);
+setInterval(liveUpdate,3000);
+</script>
